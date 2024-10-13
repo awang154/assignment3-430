@@ -1,14 +1,16 @@
 #lang typed/racket
 (require rackunit)
 
-(require (submod ".." ts))
-  (tstruct FunDefC ([name : Symbol] [arg : Symbol] [body : ExprC]))
-  (define-type ExprC (U NumC IdC AppC PlusC MultC))
-  (tstruct NumC ([n : Real]))
-  (tstruct IdC ([s : Symbol]))
-  (tstruct AppC ([fun : Symbol] [arg : ExprC]))
-  (tstruct PlusC ([l : ExprC] [r : ExprC]))
-  (tstruct MultC ([l : ExprC] [r : ExprC]))
+;; Define types for binary operators, conditionals, etc.
+(define-type ExprC (U NumC BinopC FunCallC Ifleq0C))
+(struct NumC ([n : Real]) #:transparent)
+(struct BinopC ([op : String] [left : ExprC] [right : ExprC]) #:transparent)
+(struct FunCallC ([name : String] [args : (Listof ExprC)]) #:transparent)
+(struct Ifleq0C ([test : ExprC] [then-branch : ExprC] [else-branch : ExprC]) #:transparent)
+
+;; FundefC represents function definitions
+(define-type FundefC (U FundefC))
+(struct FundefC ([name : String] [params : (Listof String)] [body : ExprC]) #:transparent)
 
 
 (define (interp [e : ExprC] [fds : (listof FunDefC)]) : number
